@@ -10,7 +10,6 @@ fn main() {
     }
 
     // TODO -> CHECK IF FILE EXITS
-    // TODO -> ADD COLORS
 
     let image_path: &str = &args[1];
 
@@ -19,7 +18,6 @@ fn main() {
 
 fn image_to_ascii(image: &DynamicImage, scale: u32) {
     let characters: Vec<char> = " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$".chars().collect();
-    let scaled_index = (255.0 / characters.len() as f32).round() as usize;
 
     for y in 0..image.height() {
         for x in 0..image.width() {
@@ -35,7 +33,7 @@ fn image_to_ascii(image: &DynamicImage, scale: u32) {
                 average_brightness = 0;
             }
 
-            print!("{}", characters[average_brightness / scaled_index]);
+            print!("{}", get_colored_char(characters[get_scaled_index(&characters, 255, average_brightness)], pixel[0], pixel[1], pixel[2]));
 
         }
 
@@ -50,4 +48,24 @@ fn image_to_ascii(image: &DynamicImage, scale: u32) {
 
 fn get_image(path: &str) -> DynamicImage {
     image::open(path).unwrap()
+}
+
+fn get_scaled_index<T>(list: &Vec<T>, max_values: u8, index_to_scale: usize) -> usize {
+    let max_index: f32 = (list.len() - 1) as f32;
+    let divisor: f32 = max_values as f32 / (max_index);
+    let result: f32 = index_to_scale as f32 / divisor;
+
+    if result.fract() == 0.0 {
+        return result as usize
+    }
+
+    if result.round() > max_index {
+        return max_index as usize
+    }
+
+    result as usize
+}
+
+fn get_colored_char(text: char, r: u8, g: u8, b: u8) -> String {
+    format!("\x1b[38;2;{r};{g};{b}m{text}\x1b[0m")
 }
