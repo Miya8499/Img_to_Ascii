@@ -4,16 +4,18 @@ use std::env;
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    if args.len() < 2 {
-        println!("Usage: ImgToAscii <image_path>");
+    if args.len() < 3 {
+        println!("Usage: ImgToAscii <image_path> <scale>");
         return;
     }
 
     // TODO -> CHECK IF FILE EXITS
 
     let image_path: &str = &args[1];
+    let scale: u32 = args[2].parse::<u32>()
+        .expect("The scale has to be a number!");
 
-    image_to_ascii(&get_image(image_path), 8);
+    image_to_ascii(&get_image(image_path), scale);
 }
 
 fn image_to_ascii(image: &DynamicImage, scale: u32) {
